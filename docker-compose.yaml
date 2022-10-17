@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  bot:
+    build:
+      context: .
+    image: yesha999/wikiandtranslationinone
+    environment:
+      API_ID: $API_ID
+      API_HASH: $API_ID
+      BOT_TOKEN: $BOT_TOKEN
+    ports:
+      - 8443:8443
+    volumes:
+      - ./.docker_env:/app/.env
