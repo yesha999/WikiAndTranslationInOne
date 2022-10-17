@@ -99,8 +99,9 @@ async def translate(bot: Client, message: Message):
     translation = translator.translate(message.text, dest=lang)
     await bot.send_message(message.chat.id, translation.text)
 
-    source_language = translation.src if translation.src != 'ua' or 'mn' else source_language = "ru"
-    # Иногда русский язык определяется как другой язык
+    source_language = translation.src
+    if source_language == 'ua' or 'mn': # Иногда русский язык определяется как другой язык
+        source_language = "ru"
     if source_language == "ru":  # Если начальный язык был русский, ищем в Вики на русском.
         wiki_text = wiki_search("ru", message.text[:300])
         if wiki_text is not None:
