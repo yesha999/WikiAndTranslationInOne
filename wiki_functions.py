@@ -14,11 +14,11 @@ def wiki_search(lang: str, text: str) -> str | None:
     except:
         return None
     try:
-        wiki_info = wikipedia.summary(wiki_title, sentences=3, chars=WIKI_INFORMATION_LENGTH)
+        wiki_info = wikipedia.summary(wiki_title, sentences=2, chars=WIKI_INFORMATION_LENGTH)
     except wikipedia.exceptions.DisambiguationError as e:
         first_wiki_title = random.choice(e.options)  # Если падает ошибка с неоднозначностью запроса,
         # выберем рандомный вариант
-        wiki_info = wikipedia.summary(first_wiki_title, sentences=3, chars=WIKI_INFORMATION_LENGTH)
+        wiki_info = wikipedia.summary(first_wiki_title, sentences=2, chars=WIKI_INFORMATION_LENGTH)
     return wiki_info
 
 
