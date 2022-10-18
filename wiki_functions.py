@@ -20,7 +20,7 @@ def wiki_search(lang: str, text: str) -> str | None:
         first_wiki_title = random.choice(e.options)  # Если падает ошибка с неоднозначностью запроса,
         # выберем рандомный вариант
         wiki_info = wikipedia.summary(first_wiki_title, sentences=WIKI_SENTENCES, chars=WIKI_INFORMATION_LENGTH)
-    if len(wiki_info) < 80:
+    if len(wiki_info) < 120: # Если мало текста, можно еще предложение добавить.
         wiki_info = wikipedia.summary(wiki_title, sentences=WIKI_SENTENCES + 1, chars=WIKI_INFORMATION_LENGTH)
     return wiki_info
 
