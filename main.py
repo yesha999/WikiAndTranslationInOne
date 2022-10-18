@@ -11,6 +11,7 @@ from wiki_functions import wiki_message
 bot = Client("my_bot", api_id=int(os.getenv("API_ID")),
              api_hash=os.getenv("API_HASH"), bot_token=os.getenv("BOT_TOKEN"))
 LANGUAGES = ["ru", "en", "zh-cn", "es", "ar", "pt", "ja", "de", "fr"]
+EXCEPTION_LANGUAGES = ["uk", "mn", "be", "ky", "kk", "tg"]
 
 
 @bot.on_message(filters.command("lang") & filters.private)
@@ -70,7 +71,7 @@ async def translate_and_wiki(bot: Client, message: Message):
     translator = Translator()
     translation = translator.translate(message.text, dest=lang)
     source_language = translation.src
-    if source_language == 'uk' or source_language == 'mn':  # Иногда русский язык определяется как другой язык,
+    if source_language in EXCEPTION_LANGUAGES:  # Иногда русский язык определяется как другой язык,
         # Пример: слово "баг" определяется как монгольское и перевод неправильный.
         source_language = "ru"
         translation = translator.translate(message.text, dest=lang, src=source_language)
