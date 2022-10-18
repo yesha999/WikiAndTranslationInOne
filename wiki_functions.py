@@ -17,9 +17,9 @@ def wiki_search(lang: str, text: str) -> str | None:
     try:
         wiki_info = wikipedia.summary(wiki_title, sentences=WIKI_SENTENCES, chars=WIKI_INFORMATION_LENGTH)
     except wikipedia.exceptions.DisambiguationError as e:
-        first_wiki_title = random.choice(e.options)  # Если падает ошибка с неоднозначностью запроса,
+        random_wiki_title = random.choice(e.options)  # Если падает ошибка с неоднозначностью запроса,
         # выберем рандомный вариант
-        wiki_info = wikipedia.summary(first_wiki_title, sentences=WIKI_SENTENCES, chars=WIKI_INFORMATION_LENGTH)
+        wiki_info = wikipedia.summary(random_wiki_title, sentences=WIKI_SENTENCES, chars=WIKI_INFORMATION_LENGTH)
     if len(wiki_info) < 150: # Если мало текста, можно еще пару предложений добавить.
         wiki_info = wikipedia.summary(wiki_title, sentences=WIKI_SENTENCES + 2, chars=WIKI_INFORMATION_LENGTH)
     return wiki_info

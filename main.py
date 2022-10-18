@@ -70,10 +70,11 @@ async def translate_and_wiki(bot: Client, message: Message):
     translator = Translator()
     translation = translator.translate(message.text, dest=lang)
     source_language = translation.src
-    if source_language == 'ua' or 'mn':  # Иногда русский язык определяется как другой язык,
+    if source_language == 'uk' or source_language == 'mn':  # Иногда русский язык определяется как другой язык,
         # Пример: слово "баг" определяется как монгольское и перевод неправильный.
         source_language = "ru"
         translation = translator.translate(message.text, dest=lang, src=source_language)
+
     await bot.send_message(message.chat.id, translation.text)
     if check_user_wiki_enabled(message):
         await wiki_message(bot, message, translation, lang, source_language)
