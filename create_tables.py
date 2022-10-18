@@ -6,7 +6,8 @@ with sqlite3.connect("tguser_lang.db") as connection:
 create_tguser_lang = ("""CREATE TABLE tguser_lang
   (id INTEGER PRIMARY KEY AUTOINCREMENT,
   tg_user_id VARCHAR (20) NOT NULL UNIQUE, 
-  text_language VARCHAR (2)
+  text_language VARCHAR (2) DEFAULT ('en'),
+  wiki_enabled BOOLEAN DEFAULT (TRUE)
   )
   """)
 
