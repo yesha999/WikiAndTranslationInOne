@@ -2,39 +2,32 @@ import os
 
 from googletrans import Translator
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery
+from pyrogram.types import Message, CallbackQuery
 
-from db_functions import change_user_language, check_user_language, check_user_wiki_enabled, off_wiki_enabled, \
-    on_wiki_enabled
+from db_functions import change_dest_user_language, check_user_wiki_enabled, off_wiki_enabled, \
+    on_wiki_enabled, change_src_user_language, check_user_dest_language, check_user_src_language
+from keyboards import dest_languages_keyboard, src_languages_keyboard
 from wiki_functions import wiki_message
 
 bot = Client("my_bot", api_id=int(os.getenv("API_ID")),
              api_hash=os.getenv("API_HASH"), bot_token=os.getenv("BOT_TOKEN"))
+
 LANGUAGES = ["ru", "en", "zh-cn", "es", "ar", "pt", "ja", "de", "fr"]
+SRC_LANGUAGES = ["src_ru", "src_en", "src_zh-cn", "src_es", "src_ar", "src_pt", "src_ja", "src_de", "src_fr",
+                 "src_auto"]
 EXCEPTION_LANGUAGES = ["uk", "mn", "be", "ky", "kk", "tg", "mk", "bg"]
 
 
 @bot.on_message(filters.command("lang") & filters.private)
-async def change_language(bot: Client, message: Message):
-    keyboard = InlineKeyboardMarkup([[
-        InlineKeyboardButton("Русский", callback_data="ru"),
-        InlineKeyboardButton("English", callback_data="en"),
-        InlineKeyboardButton("中文", callback_data="zh-cn")],
-        [InlineKeyboardButton("Español", callback_data="es"),
-         InlineKeyboardButton("العربية", callback_data="ar"),
-         InlineKeyboardButton("Português", callback_data="pt")],
-        [InlineKeyboardButton("日本語", callback_data="ja"),
-         InlineKeyboardButton("Deutsch", callback_data="de"),
-         InlineKeyboardButton("Français", callback_data="fr")],
-    ], )
-    await message.reply_text("На какой язык переводить?", reply_markup=keyboard)
+async def change_dest_language(bot: Client, message: Message):
+    await message.reply_text("На какой язык переводить?", reply_markup=dest_languages_keyboard)
 
 
 @bot.on_message(filters.command("start") & filters.private)
 async def start_bot(bot: Client, message: Message):
     await message.reply_text(
         text=f"Привет **{message.from_user.first_name}** \n\n __Я самый умный и простой Бот-переводчик__")
-    await change_language(bot, message)
+    await change_dest_language(bot, message)
 
 
 @bot.on_message(filters.command("offwiki") & filters.private)
@@ -50,35 +43,47 @@ async def on_wiki(bot: Client, message: Message):
 
 
 @bot.on_callback_query()
-async def memorizing_language(bot: Client, answer_message: CallbackQuery):
+async def choose_lang_menu(bot: Client, answer_message: CallbackQuery):
     """
     Если пользователь впервые нажал /start, его запишем в базу данных и запомним язык, на который
-    он хочет переводить, если же пользователь захочет изменить язык,
-    он нажмет /start (или просто нажмет на keyboard button) и изменит его.
+    он хочет переводить.
     """
-    if answer_message.data in LANGUAGES:  # Можно было
-        # бы обойтись без оператора IF, он сделан для случаев, если в дальнейшем развитии
-        # приложения появятся другие callback_query
-        change_user_language(bot, answer_message)
+    if answer_message.data in LANGUAGES:
+        change_dest_user_language(bot, answer_message)  # Меняем целевой язык в базе данных
         translator = Translator()
         translation = translator.translate("Язык выбран.", dest=answer_message.data, src='ru')
-        await bot.send_message(answer_message.message.chat.id, translation.text)
+        await answer_message.answer(translation.text)
+    if answer_message.data == "page_2":
+        await bot.send_message(answer_message.message.chat.id, "С какого языка переводить?",
+                               reply_markup=src_languages_keyboard)
+    if answer_message.data == "page_1":
+        await change_dest_language(bot, answer_message.message)
+    if answer_message.data in SRC_LANGUAGES:
+        change_src_user_language(bot, answer_message)  # Меняем язык ввода в базе данных
+        src_lang = answer_message.data[4:]  # Стираем src_
+        if src_lang == "auto":
+            await answer_message.answer("Язык ввода определяется автоматически")
+        else:
+            translator = Translator()
+            translation = translator.translate("Язык ввода выбран.", dest=src_lang, src='ru')
+            await answer_message.answer(translation.text)
 
 
 @bot.on_message(filters.text & filters.private)
 async def translate_and_wiki(bot: Client, message: Message):
-    lang = check_user_language(message)
+    dest_lang = check_user_dest_language(message)
+    src_lang = check_user_src_language(message)
     translator = Translator()
-    translation = translator.translate(message.text, dest=lang)
+    translation = translator.translate(message.text, dest=dest_lang, src=src_lang)
     source_language = translation.src
     if source_language in EXCEPTION_LANGUAGES:  # Иногда русский язык определяется как другой язык,
         # Пример: слово "баг" определяется как монгольское и перевод неправильный.
         source_language = "ru"
-        translation = translator.translate(message.text, dest=lang, src=source_language)
+        translation = translator.translate(message.text, dest=dest_lang, src=source_language)
 
     await bot.send_message(message.chat.id, translation.text)
     if check_user_wiki_enabled(message):
-        await wiki_message(bot, message, translation, lang, source_language)
+        await wiki_message(bot, message, translation, dest_lang, source_language)
 
 
 if __name__ == '__main__':

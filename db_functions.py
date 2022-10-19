@@ -4,7 +4,7 @@ from pyrogram import Client
 from pyrogram.types import CallbackQuery, Message
 
 
-def change_user_language(bot: Client, answer_message: CallbackQuery):
+def change_dest_user_language(bot: Client, answer_message: CallbackQuery):
     try:
         with sqlite3.connect("tguser_lang.db") as connection:
             cursor = connection.cursor()
@@ -22,7 +22,25 @@ def change_user_language(bot: Client, answer_message: CallbackQuery):
     cursor.close()
 
 
-def check_user_language(message: Message) -> str:
+def change_src_user_language(bot: Client, answer_message: CallbackQuery):
+    try:
+        with sqlite3.connect("tguser_lang.db") as connection:
+            cursor = connection.cursor()
+    except sqlite3.Error as error:
+        pass
+    src_language = answer_message.data[4:]  # обрезаем src_ перед языком
+    update_tguser_lang = (f"""
+    INSERT INTO tguser_lang (tg_user_id, src_language) 
+    VALUES ('{answer_message.from_user.id}', '{src_language}')
+    ON CONFLICT (tg_user_id) DO UPDATE SET src_language='{src_language}'
+    WHERE tg_user_id='{answer_message.from_user.id}';
+    """)
+    cursor.execute(update_tguser_lang)
+    connection.commit()
+    cursor.close()
+
+
+def check_user_dest_language(message: Message) -> str:
     try:
         with sqlite3.connect("tguser_lang.db") as connection:
             cursor = connection.cursor()
@@ -38,6 +56,26 @@ def check_user_language(message: Message) -> str:
         lang = records[0][0]
     except:
         lang = "en"  # Если пользователь не выбрал язык после /start, ему будет переводиться на английский
+    cursor.close()
+    return lang
+
+
+def check_user_src_language(message: Message) -> str:
+    try:
+        with sqlite3.connect("tguser_lang.db") as connection:
+            cursor = connection.cursor()
+    except sqlite3.Error as error:
+        return "en"
+
+    select_query = f"""
+    SELECT src_language from tguser_lang WHERE tg_user_id={message.from_user.id}
+    """
+    cursor.execute(select_query)
+    records = cursor.fetchall()
+    try:
+        lang = records[0][0]
+    except:
+        lang = "auto"
     cursor.close()
     return lang
 
