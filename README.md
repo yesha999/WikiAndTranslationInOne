@@ -1,4 +1,4 @@
-<h1 align="center">WikiAndTranslationInOne</h1>
+<h1 align="center">Translate&Wiki</h1>
 
 
 ## Описание
