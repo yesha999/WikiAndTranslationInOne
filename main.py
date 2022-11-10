@@ -51,7 +51,7 @@ async def choose_lang_menu(bot: Client, answer_message: CallbackQuery):
     if answer_message.data in LANGUAGES:
         change_dest_user_language(bot, answer_message)  # Меняем целевой язык в базе данных
         translator = Translator()
-        translation = translator.translate("Язык выбран.", dest=answer_message.data, src='ru')
+        translation = translator.translate("Язык перевода выбран.", dest=answer_message.data, src='ru')
         await answer_message.edit_message_text(translation.text, reply_markup=lang_keyboard)
     if answer_message.data == "page_2":
         await answer_message.edit_message_text("С какого языка переводить?",
