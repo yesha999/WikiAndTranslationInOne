@@ -12,8 +12,8 @@ from wiki_functions import wiki_message
 bot = Client("my_bot", api_id=int(os.getenv("API_ID")),
              api_hash=os.getenv("API_HASH"), bot_token=os.getenv("BOT_TOKEN"))
 
-LANGUAGES = ["ru", "en", "zh-cn", "es", "ar", "pt", "ja", "de", "fr"]
-SRC_LANGUAGES = ["src_ru", "src_en", "src_zh-cn", "src_es", "src_ar", "src_pt", "src_ja", "src_de", "src_fr",
+LANGUAGES = ["ru", "en", "zh-cn", "es", "ar", "pt", "ja", "de", "fr", "tr"]
+SRC_LANGUAGES = ["src_ru", "src_en", "src_zh-cn", "src_es", "src_ar", "src_pt", "src_ja", "src_de", "src_fr", "tr",
                  "src_auto"]
 EXCEPTION_LANGUAGES = ["uk", "mn", "be", "ky", "kk", "tg", "mk", "bg"]
 

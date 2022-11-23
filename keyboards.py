@@ -10,6 +10,7 @@ dest_languages_keyboard = InlineKeyboardMarkup([[
     [InlineKeyboardButton("日本語", callback_data="ja"),
      InlineKeyboardButton("Deutsch", callback_data="de"),
      InlineKeyboardButton("Français", callback_data="fr")],
+    [InlineKeyboardButton("Türk", callback_data="tr")],
     [InlineKeyboardButton("Изменить язык ввода", callback_data="page_2")]])
 
 src_languages_keyboard = InlineKeyboardMarkup([
@@ -25,6 +26,7 @@ src_languages_keyboard = InlineKeyboardMarkup([
     [InlineKeyboardButton("日本語", callback_data="src_ja"),
      InlineKeyboardButton("Deutsch", callback_data="src_de"),
      InlineKeyboardButton("Français", callback_data="src_fr")],
+    [InlineKeyboardButton("Türk", callback_data="src_tr")],
     [InlineKeyboardButton("Изменить язык перевода", callback_data="page_1")]])
 
 lang_keyboard = InlineKeyboardMarkup([
