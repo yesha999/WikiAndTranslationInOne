@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   api:
+    restart: always
     image: yesha999/wikiandtranslationinone:$GITHUB_REF_NAME-$GITHUB_RUN_ID
     environment:
       API_ID: $API_ID
